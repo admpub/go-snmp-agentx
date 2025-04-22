@@ -1,8 +1,13 @@
 package logger
 
 import (
+	"io"
 	"log"
-	"log/syslog"
+	"os"
+	"path/filepath"
+	"strings"
+
+	myLog "github.com/admpub/log"
 )
 
 var (
@@ -12,17 +17,12 @@ var (
 	errorLogger *log.Logger
 )
 
-// 初始化 syslog
-func init() {
-	sysLogger, err := syslog.New(syslog.LOG_INFO|syslog.LOG_DAEMON, "snmp_agentx")
-	if err != nil {
-		log.Fatalf("Failed to initialize syslog: %v", err)
-	}
-
-	debugLogger = log.New(sysLogger, "", log.Lmsgprefix)
-	infoLogger = log.New(sysLogger, "", log.Lmsgprefix)
-	warnLogger = log.New(sysLogger, "", log.Lmsgprefix)
-	errorLogger = log.New(sysLogger, "", log.Lmsgprefix)
+// 初始化 logger
+func initLogger(w io.Writer) {
+	debugLogger = log.New(w, "", log.Lmsgprefix)
+	infoLogger = log.New(w, "", log.Lmsgprefix)
+	warnLogger = log.New(w, "", log.Lmsgprefix)
+	errorLogger = log.New(w, "", log.Lmsgprefix)
 }
 
 // Debug 级别日志
@@ -59,4 +59,25 @@ func Error(v ...interface{}) {
 
 func Errorf(format string, v ...interface{}) {
 	errorLogger.Printf(format, v...)
+}
+
+func initDefaultLog() {
+	rootDir := filepath.Dir(os.Args[0])
+	if strings.HasPrefix(rootDir, os.TempDir()) {
+		rootDir = "."
+	}
+	t := myLog.NewFileTarget()
+	var err error
+	t.FileName, err = filepath.Abs(filepath.Join(rootDir, "logs"))
+	if err != nil {
+		log.Fatalf("Failed to get absolute path: %v", err)
+		return
+	}
+	os.MkdirAll(t.FileName, os.ModePerm)
+	t.FileName += string(filepath.Separator) + `agentx_{date:2006_01_02}.log`
+	l := myLog.SetTarget(t).GetLogger(`AgentX`)
+	debugLogger = log.New(l.Writer(myLog.LevelDebug), "", log.Lmsgprefix)
+	infoLogger = log.New(l.Writer(myLog.LevelInfo), "", log.Lmsgprefix)
+	warnLogger = log.New(l.Writer(myLog.LevelWarn), "", log.Lmsgprefix)
+	errorLogger = log.New(l.Writer(myLog.LevelError), "", log.Lmsgprefix)
 }
