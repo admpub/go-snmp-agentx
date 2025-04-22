@@ -30,9 +30,17 @@ func Debug(v ...interface{}) {
 	debugLogger.Println(v...)
 }
 
+func Debugf(format string, v ...interface{}) {
+	debugLogger.Printf(format, v...)
+}
+
 // Info 级别日志
 func Info(v ...interface{}) {
 	infoLogger.Println(v...)
+}
+
+func Infof(format string, v ...interface{}) {
+	infoLogger.Printf(format, v...)
 }
 
 // Warn 级别日志
@@ -40,7 +48,15 @@ func Warn(v ...interface{}) {
 	warnLogger.Println(v...)
 }
 
+func Warnf(format string, v ...interface{}) {
+	warnLogger.Printf(format, v...)
+}
+
 // Error 级别日志
 func Error(v ...interface{}) {
 	errorLogger.Println(v...)
+}
+
+func Errorf(format string, v ...interface{}) {
+	errorLogger.Printf(format, v...)
 }

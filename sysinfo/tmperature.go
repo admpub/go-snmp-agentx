@@ -1,7 +1,7 @@
 package sysinfo
 
 import (
-	"github.com/shirou/gopsutil/host"
+	"github.com/shirou/gopsutil/v3/host"
 
 	"go-snmp-agentx/util"
 )

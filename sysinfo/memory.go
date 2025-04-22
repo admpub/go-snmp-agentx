@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/shirou/gopsutil/mem"
+	"github.com/shirou/gopsutil/v3/mem"
 
 	"go-snmp-agentx/util"
 )

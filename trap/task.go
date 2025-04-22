@@ -16,12 +16,12 @@ func SystemMonitorLoop(interval int) {
 		for _, m := range moduleList {
 			msg, err := m.Check()
 			if err != nil {
-				logger.Warn("Check %s error: %s", m.Name(), err.Error())
+				logger.Warnf("Check %s error: %s", m.Name(), err.Error())
 				continue
 			}
 
 			if msg != "" {
-				logger.Warn("Check %s: %s", m.Name(), msg)
+				logger.Warnf("Check %s: %s", m.Name(), msg)
 
 				sendList[m.OID()] = msg
 			}

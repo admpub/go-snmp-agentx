@@ -32,17 +32,19 @@ func main() {
 	if trapServer != "" {
 		trap.Init(trapServer, community, trapPort)
 		go trap.SystemMonitorLoop(trapInterval)
-		logger.Info("trap server: %s, port: %d, community:%s, interval: %d", trapServer, trapPort, community, trapInterval)
+		logger.Infof("trap server: %s, port: %d, community: %s, interval: %d", trapServer, trapPort, community, trapInterval)
 
 	}
 
+	retryIntervalDur := time.Duration(retryInterval * time.Second)
+
 	var client = new(agentx.Client)
 	var err error
-
 	for {
 		client, err = agentx.Dial("unix", socket)
 		if err != nil {
-			time.Sleep(retryInterval * time.Second)
+			logger.Errorf("snmpd connection error: %s, retrying in %d seconds...", err.Error(), retryInterval)
+			time.Sleep(retryIntervalDur)
 			continue
 		}
 
@@ -57,7 +59,7 @@ func main() {
 		session, err := client.Session()
 		if err != nil {
 			logger.Error(err.Error())
-			time.Sleep(retryInterval * time.Second)
+			time.Sleep(retryIntervalDur)
 
 			continue
 		}
@@ -67,7 +69,7 @@ func main() {
 			logger.Error(err.Error())
 			session.Close()
 
-			time.Sleep(retryInterval * time.Second)
+			time.Sleep(retryIntervalDur)
 
 			continue
 		}

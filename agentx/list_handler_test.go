@@ -26,7 +26,9 @@ func TestListHandler(t *testing.T) {
 	lh := &agentx.ListHandler{}
 	i := lh.Add("1.3.6.1.4.1.45995.3.1")
 	i.Type = pdu.VariableTypeOctetString
-	i.Value = "test"
+	i.Value = func() interface{} {
+		return "test"
+	}
 	session.Handler = lh
 
 	baseOID := value.MustParseOID("1.3.6.1.4.1.45995")
